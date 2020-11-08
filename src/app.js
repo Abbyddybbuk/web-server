@@ -3,25 +3,33 @@ const express = require('express')
 
 const app = express()
 
+// Set-up handlebar for express to render dynamic web-content
+app.set('view engine', 'hbs')
+
 // This is to ensure that your node projects boots-up with this folder
 const publicDirectoryPath = path.join(__dirname, '../public')
-app.use(express.static(publicDirectoryPath))
+app.use(express.static(publicDirectoryPath))//Important point to note here is that express.static as we are rendering static web-pages
 
-// app.get('/help', (req, res) => {
-//     res.send([{
-//         name: 'Abhijeet',
-//         age: 35
-//     },
-//     {
-//         name: 'Ankur',
-//         age: 34
-//     }
-//     ])
-// })
+app.get('', (req, res)=> {
+    res.render('index', {
+       title: 'Weather App',
+       name: 'Abhijeet Kulshreshtha'   
+    })
+})
 
-// app.get('/about', (req, res) => {
-//     res.send('<h1>We provide you weather forecast</h1>')
-// })
+app.get('/about', (req, res)=> {
+    res.render('about', {
+        title: 'About me',
+        name: 'Abhijeet Kulshreshtha'   
+     })
+})
+
+app.get('/help', (req, res)=> {
+    res.render('help', {
+        message: 'You need to help yourself'   
+     })
+})
+
 
 app.get('/weather', (req, res) => {
     res.send([{
