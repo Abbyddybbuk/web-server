@@ -3,11 +3,19 @@ const express = require('express')
 
 const app = express()
 
+// This is to ensure that your node projects boots-up with this folder...setting up for express
+const publicDirectoryPath = path.join(__dirname, '../public')
+
+//This is to ensure if the folder name (views) containing templates is changed then
+// another folder name can be configured
+const viewsPath = path.join(__dirname, '../templates')
+
 // Set-up handlebar for express to render dynamic web-content
 app.set('view engine', 'hbs')
 
-// This is to ensure that your node projects boots-up with this folder
-const publicDirectoryPath = path.join(__dirname, '../public')
+//Configuring views so that hbs can render dynamic content from templates folder
+app.set('views', viewsPath)
+
 app.use(express.static(publicDirectoryPath))//Important point to note here is that express.static as we are rendering static web-pages
 
 app.get('', (req, res)=> {
