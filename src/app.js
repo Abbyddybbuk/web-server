@@ -1,6 +1,8 @@
 const path = require('path')//this is node core-library and does not require any npm install
 const express = require('express')
 const hbs = require('hbs')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
 
 const app = express()
 
@@ -23,50 +25,85 @@ hbs.registerPartials(partialsPath)
 
 app.use(express.static(publicDirectoryPath))//Important point to note here is that express.static as we are rendering static web-pages
 
-app.get('', (req, res)=> {
+app.get('', (req, res) => {
     res.render('index', {
-       title: 'Weather App',
-       name: 'Abhijeet Kulshreshtha'   
+        title: 'Weather App',
+        name: 'Abhijeet Kulshreshtha'
     })
 })
 
-app.get('/about', (req, res)=> {
+app.get('/about', (req, res) => {
     res.render('about', {
         title: 'About me',
-        name: 'Abhijeet Kulshreshtha'   
-     })
+        name: 'Abhijeet Kulshreshtha'
+    })
 })
 
-app.get('/help', (req, res)=> {
+app.get('/help', (req, res) => {
     res.render('help', {
         message: 'You need to help yourself',
         title: 'Help Page Title',
-        name: 'Abhijeet Kulshreshtha'   
-     })
+        name: 'Abhijeet Kulshreshtha'
+    })
 })
 
 
 app.get('/weather', (req, res) => {
-    res.send([{
-        forecast: 'Pleasant weather',
-        location: 'Gwalior'
-    }])
+    if (!req.query.address) {
+        return res.send({
+            error: 'Please specify the location'
+        })
+    }
+
+    geocode(req.query.address, (error, { latitude, longitude, location }) => {
+        if (error) {
+            return res.send({
+                error: error
+            })
+        }
+
+        forecast(latitude, longitude, (error, forecastData) => {
+            if (error) {
+                return res.send({
+                    error: error
+                })
+            }
+            return res.send({
+                forecastData,
+                location,
+                address: req.query.address
+            })
+        })
+    })
+
 })
 
-app.get('/help/*', (req, res)=> {
+app.get('/products', (req, res) => {
+    if (!req.query.search) {
+        return res.send({
+            error: 'You need to provide some search team'
+        })
+    }
+
+    res.send({
+        products: []
+    })
+})
+
+app.get('/help/*', (req, res) => {
     res.render('404', {
         title: 'Help Error Page',
-        name: 'Abhijeet Kulshreshtha',           
+        name: 'Abhijeet Kulshreshtha',
         errorMessage: '404: I could not find any error page for you'
-     })
+    })
 })
 
-app.get('*', (req, res)=> {
+app.get('*', (req, res) => {
     res.render('404', {
         title: 'Error Page',
-        name: 'Abhijeet Kulshreshtha',          
+        name: 'Abhijeet Kulshreshtha',
         errorMessage: '404: PAGE NOT FOUND'
-     })
+    })
 })
 
 app.listen(3000, () => {
