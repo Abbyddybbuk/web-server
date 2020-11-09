@@ -1,5 +1,6 @@
 const path = require('path')//this is node core-library and does not require any npm install
 const express = require('express')
+const hbs = require('hbs')
 
 const app = express()
 
@@ -8,13 +9,17 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 
 //This is to ensure if the folder name (views) containing templates is changed then
 // another folder name can be configured
-const viewsPath = path.join(__dirname, '../templates')
+const viewsPath = path.join(__dirname, '../templates/views')
+
+// The below partial configuration is ensure that partials are loaded and can be used
+const partialsPath = path.join(__dirname, '../templates/partials')
 
 // Set-up handlebar for express to render dynamic web-content
 app.set('view engine', 'hbs')
 
 //Configuring views so that hbs can render dynamic content from templates folder
 app.set('views', viewsPath)
+hbs.registerPartials(partialsPath)
 
 app.use(express.static(publicDirectoryPath))//Important point to note here is that express.static as we are rendering static web-pages
 
@@ -34,7 +39,9 @@ app.get('/about', (req, res)=> {
 
 app.get('/help', (req, res)=> {
     res.render('help', {
-        message: 'You need to help yourself'   
+        message: 'You need to help yourself',
+        title: 'Help Page Title',
+        name: 'Abhijeet Kulshreshtha'   
      })
 })
 
